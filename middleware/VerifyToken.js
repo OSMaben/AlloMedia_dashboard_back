@@ -31,13 +31,7 @@ const verifyToken = async (req, res, next) => {
       throw "You are not login , Please login to get access this route";
     }
 
-    const currentUser = await UserModel.findById(decodeToken.id).select([
-      "passwordChangedAt",
-      "role",
-      "name",
-      "email",
-      "password",
-    ]);
+    const currentUser = await UserModel.findById(decodeToken.id);
 
     if (!currentUser) {
       return res.status(401).json({
