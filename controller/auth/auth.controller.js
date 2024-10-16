@@ -56,7 +56,7 @@ const resendVerification = async (req, res) => {
     const token = CreateToken({ id: user._id }, "5m");
 
     const confirmationLink =
-      "http://localhost:8001/api/auth/verifyAcount/" + token;
+      "http://localhost:8080/api/auth/verifyAcount/" + token;
 
     await envoyerEmail(
       user.email,
