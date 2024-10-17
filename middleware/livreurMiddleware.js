@@ -6,7 +6,7 @@ const livreurMiddleware = (req, res, next) => {
     if (req.user.role !== 'livreur') {
       return res.status(403).json({ message: 'Access denied. Livreurs only.' });
     }
-  
+
     next();
   };
   
