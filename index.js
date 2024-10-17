@@ -3,6 +3,8 @@ const path = require("path");
 const dotenv = require("dotenv");
 const dbConection = require("./config/database");
 const app = express();
+const adminMiddleware = require("./middleware/adminMiddleware");
+const verifyToken = require("./middleware/VerifyToken");
 const authRouter = require("./router/auth/auth.router");
 
 const profileRouter = require("./router/profile.router");
@@ -24,7 +26,7 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/auth/", authRouter);
-app.use("/api/v1/admin/", adminRouter);
+app.use("/api/v1/admin/", verifyToken, adminMiddleware, adminRouter);
 
 
 app.use("/api/profile/", profileRouter);

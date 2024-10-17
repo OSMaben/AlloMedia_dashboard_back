@@ -27,7 +27,6 @@ const RestoSchema = new mongoose.Schema(
     bio: {
       type: String,
       trim: true,
-      required: [true, "bio required"],
       minlength: [2, "Bio must be at least 2 characters long"],
       maxlength: [50, "Bio must be less than 50 characters"],
     },
@@ -35,7 +34,6 @@ const RestoSchema = new mongoose.Schema(
       {
         type: String,
         trim: true,
-        required: [true, "category required"],
         minlength: [2, "Category must be at least 2 characters long"],
         maxlength: [50, "Category must be less than 50 characters"],
       },
@@ -65,7 +63,6 @@ const RestoSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: [true, "Address required"],
     },
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
