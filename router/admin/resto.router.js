@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   createUserWithRestaurant,
-} = require("../../controller/auth/admin/resto.controller");
+} = require("../../controller/admin/resto.controller");
 const {
   validiteResto,
   validiteUser,

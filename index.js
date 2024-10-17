@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const dbConection = require("./config/database");
 const app = express();
+const adminMiddleware = require("./middleware/adminMiddleware");
+const verifyToken = require("./middleware/VerifyToken");
 const authRouter = require("./router/auth/auth.router");
 
 const adminRouter = require("./router/admin/resto.router");
@@ -20,7 +22,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth/", authRouter);
-app.use("/api/v1/admin/", adminRouter);
+app.use("/api/v1/admin/", verifyToken, adminMiddleware, adminRouter);
 
 app.use((err, req, res, next) => {
   return res.status(400).json({ err });

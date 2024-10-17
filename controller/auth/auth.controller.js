@@ -32,7 +32,8 @@ const regester = async (req, res) => {
       "verfei accoute",
       confirmationLink,
       null,
-      "OTP"
+      "OTP",
+      null
     );
 
     return res.status(201).json({
@@ -63,7 +64,8 @@ const resendVerification = async (req, res) => {
       "verfei accoute",
       confirmationLink,
       null,
-      "OTP"
+      "OTP",
+      null
     );
 
     return res.status(201).json({
@@ -105,7 +107,7 @@ const verifierAccount = async (req, res) => {
     if (!currentUser) {
       return res.status(401).json({
         status: "fail",
-        message: "The user belonging to this token no longer exists.",
+        message: "The user belonging to this token no longer exists yyyyyyyy",
       });
     }
 
@@ -173,7 +175,8 @@ const login = async (req, res) => {
       "verfei accoute par code",
       (confirmationLink = null),
       code,
-      "2FA"
+      "2FA",
+      null
     );
 
     return res.status(201).json({
@@ -217,7 +220,8 @@ const forgetpassword = async (req, res) => {
       "forgetpassword",
       (confirmationLink = null),
       code,
-      "forgetpassword"
+      "forgetpassword",
+      null
     );
 
     return res.status(200).json({
