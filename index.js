@@ -3,6 +3,8 @@ const dotenv = require("dotenv");
 const dbConection = require("./config/database");
 const app = express();
 const authRouter = require("./router/auth/auth.router");
+
+const adminRouter = require("./router/admin/resto.router");
 const cors = require("cors");
 dbConection();
 dotenv.config();
@@ -18,6 +20,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth/", authRouter);
+app.use("/api/v1/admin/", adminRouter);
 
 app.use((err, req, res, next) => {
   return res.status(400).json({ err });
