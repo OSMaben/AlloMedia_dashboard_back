@@ -1,10 +1,13 @@
 const express = require("express");
+const path = require("path");
 const dotenv = require("dotenv");
 const dbConection = require("./config/database");
 const app = express();
 const authRouter = require("./router/auth/auth.router");
 
+const profileRouter = require("./router/profile.router");
 const adminRouter = require("./router/admin/resto.router");
+
 const cors = require("cors");
 dbConection();
 dotenv.config();
@@ -18,10 +21,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/auth/", authRouter);
 app.use("/api/v1/admin/", adminRouter);
 
+
+app.use("/api/profile/", profileRouter);
 app.use((err, req, res, next) => {
   return res.status(400).json({ err });
 });
