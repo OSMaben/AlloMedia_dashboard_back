@@ -38,6 +38,12 @@ const envoyerEmail = async (
         path.join(__dirname, "public", "forgetpassword.html"),
         "utf8"
       );
+    } else if(type === "livreur"){
+      htmlTemplate = fs.readFileSync(
+        path.join(__dirname, "public", "livreur.html"),
+        "utf8"
+      );
+
     } else {
       htmlTemplate = fs.readFileSync(
         path.join(__dirname, "public", "code2FA.html"),
