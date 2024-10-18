@@ -142,9 +142,26 @@ const refusedResto = async (req, res) => {
   }
 };
 
+const getListrestaurants = async (req, res) => {
+  try {
+    const restaurants = await RestoModel.find({ isAccepted: false });
+
+    return res.status(200).json({
+      restaurants,
+    });
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createUserWithRestaurant,
   deleteRestaurant,
   acceptedResto,
   refusedResto,
+  getListrestaurants,
 };
