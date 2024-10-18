@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { number, object, boolean } = require("joi");
 
 const RestoSchema = new mongoose.Schema(
   {
@@ -64,6 +63,8 @@ const RestoSchema = new mongoose.Schema(
     address: {
       type: String,
     },
+    isVisible: { type: Boolean, default: true },
+    isDeleted:{ type: Boolean, default: false },
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

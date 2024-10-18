@@ -2,7 +2,7 @@ const { check } = require("express-validator");
 const handelParamesError = require("../../middleware/handelParamesError");
 const UserModel = require("../../model/user.model");
 const RestoModel = require("../../model/Resto.model");
-const ValiditUserId = [
+const ValiditRestoId = [
   check("id").isMongoId().withMessage("Id is not fond"),
   handelParamesError,
 ];
@@ -68,4 +68,5 @@ const validiteResto = [
 module.exports = {
   validiteUser,
   validiteResto,
+  ValiditRestoId,
 };
