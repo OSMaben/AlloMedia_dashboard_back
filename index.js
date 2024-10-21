@@ -4,11 +4,14 @@ const dotenv = require("dotenv");
 const dbConection = require("./config/database");
 const app = express();
 const adminMiddleware = require("./middleware/adminMiddleware");
+const gestionMiddleware = require("./middleware/managerMiddleware");
 const verifyToken = require("./middleware/VerifyToken");
 const authRouter = require("./router/auth/auth.router");
 
 const profileRouter = require("./router/profile.router");
 const adminRouter = require("./router/admin/resto.router");
+const gestionairRouter = require("./router/gestionair/RestoGestion.router");
+
 
 const cors = require("cors");
 dbConection();
@@ -27,6 +30,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/auth/", authRouter);
 app.use("/api/v1/admin/", verifyToken, adminMiddleware, adminRouter);
+  app.use("/api/v1/gestionair/", verifyToken, gestionMiddleware, gestionairRouter);
 
 
 app.use("/api/profile/", profileRouter);
