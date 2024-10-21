@@ -2,13 +2,17 @@ const express = require("express");
 const {
   createUserWithRestaurant,
   deleteRestaurant,
-  acceptedResto
+  acceptedResto,
+  refusedResto,
+  getListrestaurants,
+  getUnacceptedRestaurants,
 } = require("../../controller/admin/resto.controller");
 const {
   validiteResto,
   validiteUser,
   ValiditRestoId,
 } = require("../../validation/admin/validetUserRestaurant");
+
 const router = express.Router();
 
 router.post(
@@ -18,7 +22,10 @@ router.post(
   createUserWithRestaurant
 );
 
-router.delete("/resto/:id", ValiditRestoId ,deleteRestaurant);
+router.delete("/resto/:id", ValiditRestoId, deleteRestaurant);
 router.get("/restaurants/:id/accept", ValiditRestoId, acceptedResto);
+router.get("/restaurants/:id/refuse", ValiditRestoId, refusedResto);
+router.get("/restaurants/approved", getListrestaurants);
+router.get("/restaurants/pending", getUnacceptedRestaurants);
 
 module.exports = router;

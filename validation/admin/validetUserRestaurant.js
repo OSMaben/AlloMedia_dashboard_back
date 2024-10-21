@@ -3,7 +3,7 @@ const handelParamesError = require("../../middleware/handelParamesError");
 const UserModel = require("../../model/user.model");
 const RestoModel = require("../../model/Resto.model");
 const ValiditRestoId = [
-  check("id").isMongoId().withMessage("Id is not fond"),
+  check("id").isMongoId().withMessage("Id is not found"),
   handelParamesError,
 ];
 
