@@ -29,14 +29,7 @@ const RestoSchema = new mongoose.Schema(
       minlength: [2, "Bio must be at least 2 characters long"],
       maxlength: [50, "Bio must be less than 50 characters"],
     },
-    category: [
-      {
-        type: String,
-        trim: true,
-        minlength: [2, "Category must be at least 2 characters long"],
-        maxlength: [50, "Category must be less than 50 characters"],
-      },
-    ],
+
     menu: [
       {
         name: {
@@ -48,10 +41,9 @@ const RestoSchema = new mongoose.Schema(
           required: [true, "Menu item price required"],
         },
         image: {
-          type: Object,
+         type: String,
           default: {
-            url: "https://via.placeholder.com/150",
-            id: null,
+            url: "https://via.placeholder.com/150"
           },
         },
       },
