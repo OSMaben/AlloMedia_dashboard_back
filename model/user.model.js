@@ -36,6 +36,13 @@ const UserSchema = new mongoose.Schema(
         id: null,
       },
     },
+    imgProfileBanner: {
+      type: Object,
+      default: {
+        url: "https://www.w3schools.com/w3images/avatar2.png",
+        id: null,
+      },
+    },
     password: {
       type: String,
       trim: true,
@@ -47,14 +54,9 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["livreur", "client", "manager"],
+      enum: ["livreur", "client", "manager", "admin"],
       default: "client",
     },
-    // tokenValidet: {
-    //   token: { type: String, required: true },
-    //   expirationTime: { type: Date, required: true },
-    //   secret: { type: String, required: true },
-    // },
     isVirefier: {
       type: Boolean,
       default: false,

@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -20,7 +21,8 @@ const envoyerEmail = async (
   subject,
   confirmationLink = null,
   code = null,
-  type
+  type,
+  data = null
 ) => {
   try {
     let htmlTemplate;
@@ -35,6 +37,11 @@ const envoyerEmail = async (
     } else if (type === "forgetpassword") {
       htmlTemplate = fs.readFileSync(
         path.join(__dirname, "public", "forgetpassword.html"),
+        "utf8"
+      );
+    } else if (type === "VRA") {
+      htmlTemplate = fs.readFileSync(
+        path.join(__dirname, "public", "confirmationEmailResto.html"),
         "utf8"
       );
     } else {
@@ -54,8 +61,21 @@ const envoyerEmail = async (
       message = htmlTemplate.replace("{{code}}", code);
     }
 
+    if (data) {
+      function replacePlaceholders(template, data) {
+        for (let key in data) {
+          const placeholder = `{{${key}}}`;
+          template = template.replace(new RegExp(placeholder, "g"), data[key]);
+        }
+        return template;
+      }
+
+      // Replace placeholders with actual data
+      message = replacePlaceholders(htmlTemplate, data);
+    }
+
     const info = await transporter.sendMail({
-      from: "bbilalzaimrajawi@gmail.com",
+      from: useremail,
       to: email,
       subject: subject,
       html: message,
