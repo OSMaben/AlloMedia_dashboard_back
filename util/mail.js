@@ -21,7 +21,9 @@ const envoyerEmail = async (
   subject,
   confirmationLink = null,
   code = null,
-  type
+  type,
+  data = null,
+  livreur = null,
 ) => {
   try {
     let htmlTemplate;
@@ -38,12 +40,17 @@ const envoyerEmail = async (
         path.join(__dirname, "public", "forgetpassword.html"),
         "utf8"
       );
-    } else if(type === "livreur"){
+
+    } else if (type === "livreur") {
       htmlTemplate = fs.readFileSync(
         path.join(__dirname, "public", "livreur.html"),
         "utf8"
       );
-
+    } else if (type === "VRA") {
+      htmlTemplate = fs.readFileSync(
+        path.join(__dirname, "public", "confirmationEmailResto.html"),
+        "utf8"
+      );
     } else {
       htmlTemplate = fs.readFileSync(
         path.join(__dirname, "public", "code2FA.html"),
@@ -61,8 +68,33 @@ const envoyerEmail = async (
       message = htmlTemplate.replace("{{code}}", code);
     }
 
+    if (data) {
+      function replacePlaceholders(template, data) {
+        for (let key in data) {
+          const placeholder = `{{${key}}}`;
+          template = template.replace(new RegExp(placeholder, "g"), data[key]);
+        }
+        return template;
+      }
+
+      // Replace placeholders with actual data
+      message = replacePlaceholders(htmlTemplate, data);
+    }
+    if (livreur) {
+      function replacePlaceholders(template, livreur) {
+        for (let key in livreur) {
+          const placeholder = `{{${key}}}`;
+          template = template.replace(new RegExp(placeholder, "g"), livreur[key]);
+        }
+        return template;
+      }
+
+      // Replace placeholders with actual livreur
+      message = replacePlaceholders(htmlTemplate, livreur);
+    }
+
     const info = await transporter.sendMail({
-      from: "bbilalzaimrajawi@gmail.com",
+      from: process.env.EMAIL, 
       to: email,
       subject: subject,
       html: message,
