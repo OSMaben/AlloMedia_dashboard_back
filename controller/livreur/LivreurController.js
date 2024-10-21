@@ -166,5 +166,5 @@ module.exports = {
   updateLivreur,
   deleteLivreur,
   getActiveLivreurs,
-  restoreLivreur,
+  restoreLivreur
 };

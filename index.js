@@ -38,7 +38,7 @@ app.use((err, req, res, next) => {
   return res.status(400).json({ err });
 });
  
-app.use("/api/v1/livreur/", livreurRout); 
+app.use("/api/livreur/", livreurRout); 
 
 const server = http.createServer(app);
 
