@@ -26,6 +26,7 @@
     "nodemailer": "^6.9.15",
     "nodemon": "^3.1.3",
     "slug": "^9.1.0",
+    "slugify": "^1.6.6",
     "socket.io": "^4.8.0",
     "speakeasy": "^2.0.0"
   },

@@ -1,5 +1,5 @@
 const Commande = require("../../model/Commande.model");
-
+const User=require("../../model/user.model")
 //reffuser une commande
 const refuseCommande = async (req, res) => {
   const { commandeId } = req.params; 

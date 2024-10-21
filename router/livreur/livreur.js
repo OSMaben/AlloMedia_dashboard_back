@@ -13,6 +13,8 @@ const {
     acceptCommande,
     getLivreurCommandes } = require("../../controller/livreur/CommandeController");
 
+    const { getLivreurStatistics } = require("../../controller/livreur/StatistiqueController");
+
     const livreurMiddleware = require('../../middleware/livreurMiddleware');
  
   const router = express.Router();
@@ -28,6 +30,9 @@ const {
   router.patch('/accept-order/:orderId', livreurMiddleware, acceptCommande);
   router.patch('/refuse-order/:orderId', livreurMiddleware, refuseCommande);
   router.get('/orders', livreurMiddleware, getLivreurCommandes);
+ //statistique
+router.get('/statistics/:livreurId', getLivreurStatistics);
+
   
   module.exports = router;
   

@@ -4,6 +4,8 @@ const HashPassword = require("../../util/HashPassword");
 const envoyerEmail = require("../../util/mail");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
+const slug = require('slugify');
+
 // dotenv.config();
 //crud livreur
 const ajoutLivreur = async (req, res) => {
@@ -21,6 +23,9 @@ const { email, restaurantId } = data;
       }
       // Associate the livreur with a restaurant
       data.restaurant = restaurantId;
+      data.slug = slug(data.name);
+      data.role = "livreur";
+
       //cree livreur
       const user = await User.create(data);
          
