@@ -5,8 +5,7 @@ const restoValidation = require('../../validation/gestionair/ValidateRestoCreati
 const  ManagerMiddleware = require('../../middleware/managerMiddleware')
 const upload = require('../../util/upload');
 const {AddMenuImages}  = require('../../controller/gestionair/gestionair.controller')
-
-
+const {UpdateResto} = require("../../controller/gestionair/gestionair.controller");
 //creation of the resto
 router.post('/createResto', upload.fields([
     { name: 'logo', maxCount: 1 },
@@ -19,5 +18,5 @@ router.post('/addingMenuImages', ManagerMiddleware, upload.single('image'), AddM
 
 
 //update of the resto
-// router.post('/updateResto'));
+router.post('/updateResto', ManagerMiddleware, UpdateResto);
 module.exports = router;
