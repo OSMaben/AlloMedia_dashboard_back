@@ -26,9 +26,6 @@ const CreateResto = async (req, res) => {
             return res.status(400).json({ error: 'Please provide valid logo and image banner files' });
         }
 
-
-
-
         const restoData = {
             id,
             restoname,
