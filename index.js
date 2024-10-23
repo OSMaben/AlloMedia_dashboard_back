@@ -63,7 +63,7 @@ const profileRouter = require("./router/profile.router");
 const adminRouter = require("./router/admin/resto.router");
 const clientRouter = require("./router/client/search");
 const gestionairRouter = require("./router/gestionair/RestoGestion.router");
-const socket = require("./socket/socket");
+
 
 const cors = require("cors");
 dbConection();
@@ -97,14 +97,9 @@ app.use((err, req, res, next) => {
 app.use("/api/v1/client/", clientRouter);
 
 const server = http.createServer(app);
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
-});
 
-socket(io);
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
