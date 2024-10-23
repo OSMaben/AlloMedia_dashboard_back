@@ -10,6 +10,7 @@ const authRouter = require("./router/auth/auth.router");
 
 const profileRouter = require("./router/profile.router");
 const adminRouter = require("./router/admin/resto.router");
+const clientRouter = require("./router/client/search");
 const gestionairRouter = require("./router/gestionair/RestoGestion.router");
 
 
@@ -31,6 +32,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api/auth/", authRouter);
 app.use("/api/v1/admin/", verifyToken, adminMiddleware, adminRouter);
 app.use("/api/v1/gestionair/", verifyToken, gestionMiddleware, gestionairRouter);
+app.use("/api/v1/client/", clientRouter);
 
 
 app.use("/api/profile/", profileRouter);
