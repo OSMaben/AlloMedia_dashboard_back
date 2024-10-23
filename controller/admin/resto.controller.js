@@ -4,6 +4,7 @@ const slug = require("slug");
 const envoyerEmail = require("../../util/mail");
 const RestoModel = require("../../model/Resto.model");
 const CreateToken = require("../../util/createToken");
+const UserModel = require("../../model/user.model");
 
 const createUserWithRestaurant = async (req, res) => {
   try {
@@ -95,6 +96,17 @@ const acceptedResto = async (req, res) => {
     resto.isAccepted = true;
     await resto.save();
 
+    const manager = await UserModel.findById(resto.managerId);
+
+    if (!resto) {
+      return res.status(404).json({
+        message: "Manager not found",
+      });
+    }
+
+    manager.role = "manager";
+    await manager.save();
+
     return res.status(200).json({
       message: "Restaurant successfully accepted",
     });
@@ -106,8 +118,67 @@ const acceptedResto = async (req, res) => {
   }
 };
 
+const refusedResto = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const resto = await RestoModel.findById(id);
+
+    if (!resto) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
+
+    await resto.deleteOne();
+
+    return res.status(200).json({
+      message: "Restaurant successfully refused",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occurred while refusing the restaurant",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+const getListrestaurants = async (req, res) => {
+  try {
+    const restaurants = await RestoModel.find({ isAccepted: true });
+
+    return res.status(200).json({
+      restaurants,
+    });
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+const getUnacceptedRestaurants = async (req, res) => {
+  try {
+    const restaurants = await RestoModel.find({ isAccepted: false });
+
+    return res.status(200).json({
+      restaurants,
+    });
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createUserWithRestaurant,
   deleteRestaurant,
   acceptedResto,
+  refusedResto,
+  getListrestaurants,
+  getUnacceptedRestaurants,
 };
