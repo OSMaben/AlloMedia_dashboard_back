@@ -4,6 +4,8 @@ const {
   deleteRestaurant,
   acceptedResto,
   refusedResto,
+  getListrestaurants,
+  getUnacceptedRestaurants,
 } = require("../../controller/admin/resto.controller");
 const {
   validiteResto,
@@ -23,5 +25,7 @@ router.post(
 router.delete("/resto/:id", ValiditRestoId, deleteRestaurant);
 router.get("/restaurants/:id/accept", ValiditRestoId, acceptedResto);
 router.get("/restaurants/:id/refuse", ValiditRestoId, refusedResto);
+router.get("/restaurants/approved", getListrestaurants);
+router.get("/restaurants/pending", getUnacceptedRestaurants);
 
 module.exports = router;
