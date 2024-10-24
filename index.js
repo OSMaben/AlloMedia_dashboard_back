@@ -47,7 +47,6 @@ app.use((err, req, res, next) => {
 
 app.use("/api/v1/client/", clientRouter);
 
-const server = http.createServer(app);
 
 
 const io = require("socket.io")(server, {
