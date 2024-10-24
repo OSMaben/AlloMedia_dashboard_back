@@ -45,6 +45,10 @@ app.use((err, req, res, next) => {
   return res.status(400).json({ err });
 });
 
+app.use("/api/v1/client/", clientRouter);
+
+const server = http.createServer(app);
+
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
@@ -56,9 +60,11 @@ socket(io);
 const restaurantRouter = createRestaurantRouter(io);
 app.use("/api/v1/admin/", verifyToken, adminMiddleware, restaurantRouter);
 
+
 const res = createRes(io);
 app.use("/res", res);
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
+
