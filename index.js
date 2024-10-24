@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv");
-const dbConnection = require("./config/database");
+const dbConection = require("./config/database");
 const app = express();
 const adminMiddleware = require("./middleware/adminMiddleware");
 const gestionMiddleware = require("./middleware/managerMiddleware");
@@ -15,11 +15,10 @@ const clientRouter = require("./router/client/search");
 const socket = require("./socket/socket");
 
 const cors = require("cors");
-const http = require('http'); 
-const socketIo = require('socket.io');
-
+const createRestaurantRouter = require("./router/admin/resto.router");
+const createRes = require("./router/admin/test.router");
+dbConection();
 dotenv.config();
-dbConnection();
 
 const corsOptions = {
   origin: "http://localhost:5173",
@@ -28,9 +27,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth/", authRouter);
 app.use("/api/v1/client/", clientRouter);
@@ -45,12 +44,12 @@ app.use("/api/profile/", profileRouter);
 app.use((err, req, res, next) => {
   return res.status(400).json({ err });
 });
- 
-app.use("/api/livreur/", verifyToken ,livreurRout); 
+
+app.use("/api/v1/client/", clientRouter);
 
 const server = http.createServer(app);
 
-const server = http.createServer(app);
+
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:5173",
@@ -66,8 +65,5 @@ const res = createRes(io);
 app.use("/res", res);
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
-
-module.exports = { app, io }; 
