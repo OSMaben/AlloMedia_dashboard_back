@@ -61,6 +61,8 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'RestoModel' }, 
+    deletedAt: { type: Date, default: null }
   },
   {
     timestamps: true,

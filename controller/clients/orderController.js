@@ -1,22 +1,31 @@
-// controller/OrderController.js
-const CartModel = require('../../model/Cart');
-const OrderModel = require('../../model/Order');
+const Commande = require('../../model/Commande.model');
 
 const placeOrder = async (req, res) => {
     try {
-        // Make sure the user information is being passed correctly
-        const userId = req.body.userId;
-        if (!userId) {
-            return res.status(400).json({ error: 'User ID is missing from the request' });
+        const { userId, deliveryAddress, items, totalPrice } = req.body;
+
+        if (!userId || !deliveryAddress || !items || !totalPrice) {
+            return res.status(400).json({ error: 'User ID, delivery address, items, and total price are required' });
         }
 
-        // Proceed with order creation
-        const newOrder = new OrderModel({
-            userId: userId,
-            items: req.body.items,
-            totalPrice: req.body.totalPrice,
-            deliveryAddress: req.body.deliveryAddress,
-            status: 'Pending' // Example order status
+        // Assuming you are assigning a default livreur or fetching it based on business logic
+        const restaurantId = items[0]?.restaurantId; // Extract restaurant ID from the first item
+
+        if (!restaurantId) {
+            return res.status(400).json({ error: 'Restaurant ID is required' });
+        }
+
+        // Create a new Commande
+        const newOrder = new Commande({
+            client: userId, // Assuming userId is the client ID
+            restaurant: restaurantId, // Use the restaurant ID from the items
+            items: items.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price
+            })),
+            totalPrice: totalPrice,
+            status: 'pending' // Initial status
         });
 
         await newOrder.save();
@@ -24,9 +33,8 @@ const placeOrder = async (req, res) => {
         res.status(201).json({ message: 'Order placed successfully', order: newOrder });
     } catch (error) {
         console.error('Error placing order:', error);
-        res.status(500).json({ error: `'An internal server error occurred'${error}` });
+        res.status(500).json({ error: `'An internal server error occurred ${error}` });
     }
 };
 
 module.exports = { placeOrder };
-
