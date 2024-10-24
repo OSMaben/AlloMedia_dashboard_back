@@ -4,12 +4,12 @@ const RestoModel = require('../../model/Resto.model');
 // Add item to the cart
 const addItemToCart = async (req, res) => {
     try {
-        const { userId } = req.body; // Assuming the userId is sent in the body
-        const { menuItemId, quantity } = req.body; // Item ID from the menu and quantity
+        const { userId } = req.body; 
+        const { menuItemId, quantity } = req.body;
 
         const restaurant = await RestoModel.findOne({ 'menu._id': menuItemId });
         if (!restaurant) {
-            return res.status(404).json({ error: 'Menu item not found' });
+            return res.status(404).json({ error: 'Menu item not found Add new item' });
         }
 
         const menuItem = restaurant.menu.id(menuItemId);
