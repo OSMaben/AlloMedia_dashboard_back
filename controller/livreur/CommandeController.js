@@ -1,13 +1,13 @@
 const Commande = require("../../model/Commande.model");
-const User=require("../../model/user.model")
-//reffuser une commande
-const refuseCommande = async (req, res) => {
-  const { commandeId } = req.params; 
-  const { refusalReason } = req.body; 
-  const livreurId = req.user._id; 
+const User = require("../../model/user.model");
+
+// Refuse an order and send notification
+const refuseCommande = async (req, res, io) => {
+  const { commandeId } = req.params;
+  const { refusalReason } = req.body;
+  const livreurId = req.user._id;
 
   try {
- 
     const commande = await Commande.findById(commandeId);
 
     if (!commande) {
@@ -20,15 +20,19 @@ const refuseCommande = async (req, res) => {
 
     commande.status = 'refused';
     commande.refusalReason = refusalReason || "No reason provided";
-
     await commande.save();
+
+    // Emit notification to the manager (assuming the manager's ID is stored in the `restaurant` object)
+    io.to(commande.restaurant.managerId).emit("notification", {
+      message: `Order #${commande._id} has been refused by the delivery person.`,
+      status: commande.status,
+    });
 
     return res.status(200).json({
       status: "success",
       message: "Commande has been refused",
-      data: commande
+      data: commande,
     });
-
   } catch (error) {
     return res.status(400).json({
       message: "An error occurred while refusing the commande",
@@ -37,24 +41,18 @@ const refuseCommande = async (req, res) => {
   }
 };
 
-
-//livrer une commande
-
-
-const confirmDelivery = async (req, res) => {
+// Confirm delivery and send notification
+const confirmDelivery = async (req, res, io) => {
   const { orderId } = req.params;
-  const livreurId = req.user._id; 
+  const livreurId = req.user._id;
 
   try {
-
     const commande = await Commande.findById(orderId);
 
-  
     if (!commande) {
       return res.status(404).json({ message: "Commande non trouvée" });
     }
 
-    // Vérifier si l'utilisateur authentifié est le livreur assigné à cette commande
     if (commande.livreur.toString() !== livreurId.toString()) {
       return res.status(403).json({ message: "Vous n'êtes pas autorisé à confirmer cette livraison" });
     }
@@ -66,12 +64,17 @@ const confirmDelivery = async (req, res) => {
     commande.status = 'delivered';
     await commande.save();
 
+    // Emit notification to the manager
+    io.to(commande.restaurant.managerId).emit("notification", {
+      message: `Order #${commande._id} has been delivered.`,
+      status: commande.status,
+    });
+
     return res.status(200).json({
       status: "success",
       message: "Livraison confirmée avec succès",
-      commande
+      commande,
     });
-
   } catch (error) {
     return res.status(500).json({
       message: "Une erreur s'est produite lors de la confirmation de la livraison",
@@ -80,29 +83,22 @@ const confirmDelivery = async (req, res) => {
   }
 };
 
-
-//accepter une commande
-
-
-
-const acceptCommande = async (req, res) => {
+// Accept an order and send notification
+const acceptCommande = async (req, res, io) => {
   const { orderId } = req.params;
   const livreurId = req.user._id;
 
   try {
-   
     const commande = await Commande.findById(orderId);
 
     if (!commande) {
       return res.status(404).json({ message: "Commande non trouvée" });
     }
 
-   
     if (commande.status !== 'pending') {
       return res.status(400).json({ message: "Cette commande ne peut plus être acceptée" });
     }
 
-    
     if (commande.livreur.toString() !== livreurId.toString()) {
       return res.status(403).json({ message: "Vous n'êtes pas autorisé à accepter cette commande" });
     }
@@ -110,12 +106,17 @@ const acceptCommande = async (req, res) => {
     commande.status = 'accepted';
     await commande.save();
 
+    // Emit notification to the manager
+    io.to(commande.restaurant.managerId).emit("notification", {
+      message: `Order #${commande._id} has been accepted by the delivery person.`,
+      status: commande.status,
+    });
+
     return res.status(200).json({
       status: "success",
       message: "Commande acceptée avec succès",
-      commande
+      commande,
     });
-
   } catch (error) {
     return res.status(500).json({
       message: "Une erreur s'est produite lors de l'acceptation de la commande",
@@ -123,6 +124,7 @@ const acceptCommande = async (req, res) => {
     });
   }
 };
+
 
 
 // get livreur's orders with filters
