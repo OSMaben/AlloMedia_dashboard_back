@@ -3,7 +3,7 @@ const handelParamesError = require("../../middleware/handelParamesError");
 const RestoCreation = require("../../model/Resto.model");
 
 const restoValidation = [
-    check('id').isMongoId().withMessage("This  Id Does Not Exist"),
+    // check('id').isMongoId().withMessage("This  Id Does Not Exist"),
     check('restoname')
         .notEmpty()
         .withMessage("Restoname is required")
@@ -16,46 +16,20 @@ const restoValidation = [
                 }
             });
         }),
-    // check('logo')
-    //     .notEmpty()
-    //     .withMessage("Logo is required"),
-    // check('image_banner')
-    //     .notEmpty()
-    //     .withMessage("Image Banner is required"),
+
     check('bio')
         .notEmpty()
         .withMessage("Bio is required")
         .isLength({ min: 10 })
         .isLength({ max: 50 }),
-    check('menu')
-        .notEmpty()
-        .withMessage("Menu is required")
-        .isArray()
-        .withMessage('Menu  Should Be an array'),
-    check('menu.*.name')
-        .notEmpty()
-        .withMessage("Menu item name is required"),
 
-    check('menu.*.price')
+    check('type')
         .notEmpty()
-        .withMessage("Menu item price is required")
-        .isNumeric()
-        .withMessage("Menu item price must be a number"),
-
-    check('menu.*.image')
-        .optional() //  Optional
-        .isObject()
-        .withMessage("Image must be an object"),
-    // check('type')
-    //     .isEmpty()
-    //     .withMessage("Type is required"),
-    check('Address')
-        .isEmpty()
+        .withMessage("Type is required"),
+    check('address')
+        .notEmpty()
         .withMessage('Address is required'),
-    // check('managerId')
-    //     .isEmpty()
-    //     .withMessage('ManagerId is required')
-    //     .isMongoId().withMessage("This Manager Id is not Found"),
+
     handelParamesError,
 ]
 
