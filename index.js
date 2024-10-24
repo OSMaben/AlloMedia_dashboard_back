@@ -17,19 +17,20 @@ const cors = require("cors");
 const createRestaurantRouter = require("./router/admin/resto.router");
 const createRestoGestoiner = require("./router/gestionair/RestoGestionSocket.router");
 const createRes = require("./router/admin/test.router");
+// livreur
+const LivreurRouter = require("./router/livreur/livreur");
+const LivreurMiddleware = require("./middleware/livreurMiddleware");
+
 dbConection();
 dotenv.config();
 
 const corsOptions = {
-  origin: "http://localhost:5173",
   origin: "http://localhost:5173",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
 
 app.use(cors(corsOptions));
-
-
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
