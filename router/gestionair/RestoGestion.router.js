@@ -11,10 +11,10 @@ const VerifyToken = require("../../middleware/VerifyToken");
 
 
 //creation of the resto
-router.post('/createResto', upload.fields([
-    { name: 'logo', maxCount: 1 },
-    { name: 'image_banner', maxCount: 1 }
-]),ManagerMiddleware, VerifyToken, restoValidation,CreateResto);
+// router.post('/createResto', upload.fields([
+//     { name: 'logo', maxCount: 1 },
+//     { name: 'image_banner', maxCount: 1 }
+// ]),ManagerMiddleware, VerifyToken, restoValidation,CreateResto);
 
 //update of the resto
 router.post('/updateResto', ManagerMiddleware,VerifyToken, UpdateResto);
