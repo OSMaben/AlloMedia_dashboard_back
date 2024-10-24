@@ -31,7 +31,7 @@ const {
   router.patch('/accept-order/:orderId', livreurMiddleware, acceptCommande);
   router.patch('/refuse-order/:orderId', livreurMiddleware, refuseCommande);
   router.get('/orders', livreurMiddleware, getLivreurCommandes);
-  router.get('/commandes-today', livreurMiddleware, getLivreurCommandes);
+  router.get('/commandes-today', livreurMiddleware, getTodayLivreurCommandes);
  //statistique
 router.get('/statistics/:livreurId', getLivreurStatistics);
 
