@@ -5,7 +5,7 @@ const restoValidation = require('../../validation/gestionair/ValidateRestoCreati
 const  ManagerMiddleware = require('../../middleware/managerMiddleware')
 const upload = require('../../util/upload');
 const {AddMenuImages}  = require('../../controller/gestionair/gestionair.controller')
-const {UpdateResto,UpdatingMenu,DeleteMenu} = require("../../controller/gestionair/gestionair.controller");
+const {UpdateResto,UpdatingMenu,DeleteMenu,DeleteResto} = require("../../controller/gestionair/gestionair.controller");
 const VerifyToken = require("../../middleware/VerifyToken");
 
 
@@ -30,6 +30,7 @@ router.post('/updatingMenu', VerifyToken,ManagerMiddleware, UpdatingMenu)
 
 
 //delete of the resto
+router.post("/deleteResto",VerifyToken,ManagerMiddleware, DeleteResto );
 router.post("/deleteMenu",VerifyToken,ManagerMiddleware, DeleteMenu );
 
 

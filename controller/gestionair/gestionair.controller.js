@@ -178,7 +178,7 @@ const UpdatingMenu = async (req, res) => {
 
 
 
-const DeleteMenu = async (req,  res) => {
+const DeleteResto = async (req,  res) => {
     const currentUser = req.user._id;
     console.log(currentUser);
 
@@ -197,6 +197,31 @@ const DeleteMenu = async (req,  res) => {
 }
 
 
+const DeleteMenu = async (req,  res) => {
+    const currentUser = req.user._id;
+    console.log(currentUser);
+
+    const menuId = req.body;
+    console.log(menuId)
+    try
+    {
+        const Resto = await RestoModel.findOne({managerId: currentUser});
+        const menuIndex = Resto.menu.findIndex(item => item._id.toString() === menuId);
+        if (menuIndex === -1) return res.status(404).json({ error: 'Menu item not found' });
+
+        console.log(menuIndex)
+        Resto.menu.splice(menuIndex, 1);
+
+        await menuIndex.deleteOne({_id: menuId});
+        res.status(200).send("Menu has been deleted");
+    }catch (err)
+    {
+        console.log("there was an error", err);
+        res.status(500).json({ err: 'An internal server error occurred' });
+    }
+
+}
+
 
 
 module.exports = {
@@ -204,5 +229,6 @@ module.exports = {
     AddMenuImages,
     UpdateResto,
     UpdatingMenu,
-    DeleteMenu
+    DeleteMenu,
+    DeleteResto
 };
