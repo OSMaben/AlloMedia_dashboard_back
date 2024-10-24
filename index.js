@@ -14,6 +14,8 @@ const gestionairRouter = require("./router/gestionair/RestoGestion.router");
 const socket = require("./socket/socket");
 
 const cors = require("cors");
+const createRestaurantRouter = require("./router/admin/resto.router");
+const createRes = require("./router/admin/test.router");
 dbConection();
 dotenv.config();
 
@@ -29,7 +31,7 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth/", authRouter);
-app.use("/api/v1/admin/", verifyToken, adminMiddleware, adminRouter);
+
 app.use(
   "/api/v1/gestionair/",
   verifyToken,
@@ -49,12 +51,15 @@ const io = require("socket.io")(server, {
     methods: ["GET", "POST"],
   },
 });
-
 socket(io);
+const restaurantRouter = createRestaurantRouter(io);
+app.use("/api/v1/admin/", verifyToken, adminMiddleware, restaurantRouter);
 
+const res = createRes(io);
+app.use("/res", res);
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
 
-module.exports = app;
+// module.exports = app;

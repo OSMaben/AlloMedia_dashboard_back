@@ -3,11 +3,8 @@ const mongoose = require("mongoose");
 const notificationSchema = new mongoose.Schema(
   {
     message: { type: String, required: true },
-    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },
-    admin: {
-      default: false,
-    },
-    createdAt: { type: Date, default: Date.now },
+    mangerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: { type: Boolean, default: false },
   },
   {
     timestamps: true,
