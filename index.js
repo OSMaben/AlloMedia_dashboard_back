@@ -61,7 +61,7 @@ const authRouter = require("./router/auth/auth.router");
 const http = require("http");
 const profileRouter = require("./router/profile.router");
 const adminRouter = require("./router/admin/resto.router");
-const clientRouter = require("./router/client/search");
+const clientRouter = require("./router/client/restoClient.router");
 const gestionairRouter = require("./router/gestionair/RestoGestion.router");
 
 
