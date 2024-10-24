@@ -197,30 +197,81 @@ const DeleteResto = async (req,  res) => {
 }
 
 
-const DeleteMenu = async (req,  res) => {
-    const currentUser = req.user._id;
-    console.log(currentUser);
+const DeleteMenu = async (req, res) => {
+    const currentUser = req.user._id.toString();
+    const { menuId } = req.body;
+    if (!menuId) return res.status(400).json({ error: 'Menu ID not provided' });
 
-    const menuId = req.body;
     console.log(menuId)
-    try
-    {
-        const Resto = await RestoModel.findOne({managerId: currentUser});
+
+    try {
+        const Resto = await RestoModel.findOne({ managerId: currentUser });
+        if (!Resto) return res.status(404).json({ error: 'Restaurant not found for this manager' });
+
         const menuIndex = Resto.menu.findIndex(item => item._id.toString() === menuId);
         if (menuIndex === -1) return res.status(404).json({ error: 'Menu item not found' });
 
-        console.log(menuIndex)
         Resto.menu.splice(menuIndex, 1);
 
-        await menuIndex.deleteOne({_id: menuId});
-        res.status(200).send("Menu has been deleted");
-    }catch (err)
-    {
-        console.log("there was an error", err);
-        res.status(500).json({ err: 'An internal server error occurred' });
+        await Resto.save();
+
+        res.status(200).json({ message: "Menu has been deleted successfully" });
+    } catch (err) {
+        console.log("Error deleting menu item:", err);
+        res.status(500).json({ error: 'An internal server error occurred' });
+    }
+};
+
+
+const ListResto = async (req, res) => {
+    const currentUser = req.user._id;
+    console.log(currentUser)
+    if (!currentUser) {
+        return res.status(400).json({ error: 'Manager not found' });
     }
 
-}
+    try {
+        const RestoOfUser = await RestoModel.find({ managerId: currentUser });
+
+        if (RestoOfUser.length === 0) {
+            return res.status(404).json({ message: 'No restaurants found for this manager' });
+        }
+
+        res.status(200).json({ restaurants: RestoOfUser });
+    } catch (err) {
+        console.log("Error fetching restaurants:", err);
+        res.status(500).json({ error: `An internal server error occurred: ${err.message}` });
+    }
+};
+
+
+const ListMenu = async (req, res) => {
+    const currentUser = req.user._id;
+    console.log(currentUser);
+
+    if (!currentUser) {
+        return res.status(400).json({ error: 'Manager not found' });
+    }
+
+    try {
+        const RestoOfUser = await RestoModel.find({ managerId: currentUser });
+
+        if (RestoOfUser.length === 0) {
+            return res.status(404).json({ message: 'No restaurants found for this manager' });
+        }
+
+        const menus = RestoOfUser.map(resto => resto.menu);
+
+        res.status(200).json({ menus });
+    } catch (err) {
+        console.log("Error fetching menus:", err);
+        res.status(500).json({ error: `An internal server error occurred: ${err.message}` });
+    }
+};
+
+
+
+
 
 
 
@@ -230,7 +281,9 @@ module.exports = {
     UpdateResto,
     UpdatingMenu,
     DeleteMenu,
-    DeleteResto
+    DeleteResto,
+    ListResto,
+    ListMenu
 };
 
 
