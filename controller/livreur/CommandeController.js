@@ -166,6 +166,41 @@ const getLivreurCommandes = async (req, res) => {
   }
 };
 
+const getTodayLivreurCommandes = async (req, res) => {
+  const livreurId = req.user._id;
+
+  try {
+    // Get today's date with time reset to midnight
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Find today's orders for the livreur and sort by time
+    const commandes = await Commande.find({
+      livreur: livreurId,
+      createdAt: { $gte: today }, // filter by today's date
+    })
+      .sort({ createdAt: 1 }) // sort by creation time (ascending)
+      .populate('client')
+      .populate('restaurant')
+      .exec();
+
+    if (!commandes.length) {
+      return res.status(404).json({ message: "Aucune commande trouvée pour aujourd'hui." });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      commandes,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Une erreur s'est produite lors de la récupération des commandes",
+      error: error.message || "Erreur interne du serveur",
+    });
+  }
+};
+
 
 
 
@@ -174,4 +209,5 @@ module.exports = {
   refuseCommande,
   acceptCommande,
   getLivreurCommandes,
+  getTodayLivreurCommandes,
 };
