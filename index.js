@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv");
-const dbConection = require("./config/database");
+const dbConnection = require("./config/database");
 const app = express();
 const adminMiddleware = require("./middleware/adminMiddleware");
 const gestionMiddleware = require("./middleware/managerMiddleware");
@@ -17,8 +17,8 @@ const socket = require("./socket/socket");
 const cors = require("cors");
 const createRestaurantRouter = require("./router/admin/resto.router");
 const createRes = require("./router/admin/test.router");
-dbConection();
 dotenv.config();
+dbConnection();
 
 const corsOptions = {
   origin: "http://localhost:5173",
@@ -27,7 +27,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
