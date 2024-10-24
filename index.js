@@ -23,6 +23,7 @@ dotenv.config();
 
 const corsOptions = {
   origin: "http://localhost:5173",
+  origin: "http://localhost:5173",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
@@ -34,6 +35,13 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth/", authRouter);
+//livreur
+app.use(
+  "/api/livreur",
+  verifyToken,
+  LivreurRouter
+);
+
 app.use("/api/v1/client/", clientRouter);
 app.use(
   "/api/v1/gestionair/",
@@ -68,6 +76,8 @@ const restaurantRouter = createRestaurantRouter(io);
 app.use("/api/v1/admin/", verifyToken, adminMiddleware, restaurantRouter);
 
 const createRestoGestoinerSocket = createRestoGestoiner(io);
+
+
 app.use(
   "/api/v1/gestionair/socket",
   verifyToken,
