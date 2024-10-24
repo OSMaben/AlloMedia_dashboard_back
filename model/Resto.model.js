@@ -42,9 +42,7 @@ const RestoSchema = new mongoose.Schema(
         },
         image: {
          type: String,
-          default: {
-            url: "https://via.placeholder.com/150"
-          },
+          default: "https://via.placeholder.com/150"
         },
       },
     ],
