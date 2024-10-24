@@ -5,7 +5,7 @@ const verifyToken = async (req, res, next) => {
   // 1 check Token
   try {
     let token;
-
+    
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
