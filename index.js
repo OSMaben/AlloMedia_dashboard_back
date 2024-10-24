@@ -16,6 +16,7 @@ const socket = require("./socket/socket");
 
 const cors = require("cors");
 const createRestaurantRouter = require("./router/admin/resto.router");
+const createRestoGestoiner = require("./router/gestionair/RestoGestionSocket.router");
 const createRes = require("./router/admin/test.router");
 dbConection();
 dotenv.config();
@@ -27,6 +28,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -40,7 +42,14 @@ app.use(
   gestionairRouter
 );
 
-app.use("/api/profile/", profileRouter);
+app.use(
+  "/api/v1/gestionair/",
+  verifyToken,
+  gestionMiddleware,
+  gestionairRouter
+);
+
+app.use("/api/profile/", verifyToken, profileRouter);
 app.use((err, req, res, next) => {
   return res.status(400).json({ err });
 });
@@ -48,8 +57,6 @@ app.use((err, req, res, next) => {
 app.use("/api/v1/client/", clientRouter);
 
 const server = http.createServer(app);
-
-
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:5173",
@@ -60,6 +67,13 @@ socket(io);
 const restaurantRouter = createRestaurantRouter(io);
 app.use("/api/v1/admin/", verifyToken, adminMiddleware, restaurantRouter);
 
+const createRestoGestoinerSocket = createRestoGestoiner(io);
+app.use(
+  "/api/v1/gestionair/socket",
+  verifyToken,
+  gestionMiddleware,
+  createRestoGestoinerSocket
+);
 
 const res = createRes(io);
 app.use("/res", res);
@@ -67,3 +81,4 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
+

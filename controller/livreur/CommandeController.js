@@ -210,4 +210,5 @@ module.exports = {
   acceptCommande,
   getLivreurCommandes,
   getTodayLivreurCommandes,
+  getTodayLivreurCommandes,
 };
