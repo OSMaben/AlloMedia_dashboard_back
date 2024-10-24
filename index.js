@@ -17,12 +17,11 @@ const socket = require("./socket/socket");
 const cors = require("cors");
 const createRestaurantRouter = require("./router/admin/resto.router");
 const createRes = require("./router/admin/test.router");
-dbConection();
 dotenv.config();
 dbConnection();
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5174",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
@@ -47,7 +46,7 @@ app.use((err, req, res, next) => {
 
 app.use("/api/v1/client/", clientRouter);
 
-const server = http.createServer(app);
+
 
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
