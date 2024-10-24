@@ -6,6 +6,7 @@ const  ManagerMiddleware = require('../../middleware/managerMiddleware')
 const upload = require('../../util/upload');
 const {AddMenuImages}  = require('../../controller/gestionair/gestionair.controller')
 const {UpdateResto,UpdatingMenu,DeleteMenu,DeleteResto,ListResto,ListMenu} = require("../../controller/gestionair/gestionair.controller");
+const {ListOrders} = require("../../controller/gestionair/GestionairOrders.controller");
 const VerifyToken = require("../../middleware/VerifyToken");
 
 
@@ -42,6 +43,11 @@ router.get('/list_Resto',VerifyToken,ManagerMiddleware ,ListResto);
 
 //show Menus Of   A resto
 router.get('/list-all-menu',VerifyToken,ManagerMiddleware ,ListMenu);
+
+
+
+//List All Orders Of the Gestionair
+router.get("/List_allMyOrders", VerifyToken,ManagerMiddleware, ListOrders);
 
 
 module.exports = router;
