@@ -170,21 +170,21 @@ const getLivreurCommandes = async (req, res) => {
 
 const getTodayLivreurCommandes = async (req, res) => {
   const livreurId = req.user._id;
+  // console.log(livreurId);
 
   try {
-    // Get today's date with time reset to midnight
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Find today's orders for the livreur and sort by time
     const commandes = await Commande.find({
       livreur: livreurId,
-      createdAt: { $gte: today }, // filter by today's date
+      createdAt: { $gte: today }, 
     })
-      .sort({ createdAt: 1 }) // sort by creation time (ascending)
+      .sort({ createdAt: 1 }) 
       .populate('client')
-      .populate('restaurant')
       .exec();
+      // console.log("ffffffffffffffffffffffffffffffff",commandes);
 
     if (!commandes.length) {
       return res.status(404).json({ message: "Aucune commande trouvée pour aujourd'hui." });
@@ -197,11 +197,39 @@ const getTodayLivreurCommandes = async (req, res) => {
 
   } catch (error) {
     return res.status(500).json({
-      message: "Une erreur s'est produite lors de la récupération des commandes",
+      message: "Une erreur s'est produite lors de la récupération des commandes ",
       error: error.message || "Erreur interne du serveur",
     });
   }
 };
+
+
+
+const getCommandeDetails = async (req, res) => {
+  const { id } = req.params; 
+  try {
+ 
+    const commande = await Commande.findById(id)
+      .populate('client', 'name phone ') 
+      .populate('restaurant', 'restoname address') 
+      .exec();
+
+    if (!commande) {
+      return res.status(404).json({ message: "Commande non trouvée" });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      commande,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Erreur lors de la récupération des détails de la commande",
+      error: error.message,
+    });
+  }
+};
+
 
 
 
@@ -213,4 +241,5 @@ module.exports = {
   getLivreurCommandes,
   getTodayLivreurCommandes,
   getTodayLivreurCommandes,
+  getCommandeDetails,
 };
