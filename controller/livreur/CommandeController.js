@@ -172,16 +172,16 @@ const getTodayLivreurCommandes = async (req, res) => {
   const livreurId = req.user._id;
 
   try {
-    // Get today's date with time reset to midnight
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Find today's orders for the livreur and sort by time
+    
     const commandes = await Commande.find({
       livreur: livreurId,
-      createdAt: { $gte: today }, // filter by today's date
+      createdAt: { $gte: today }, 
     })
-      .sort({ createdAt: 1 }) // sort by creation time (ascending)
+      .sort({ createdAt: 1 })
       .populate('client')
       .populate('restaurant')
       .exec();
