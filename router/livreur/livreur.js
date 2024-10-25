@@ -12,7 +12,8 @@ const {
     refuseCommande,
     acceptCommande,
     getLivreurCommandes ,
-    getTodayLivreurCommandes} = require("../../controller/livreur/CommandeController");
+    getTodayLivreurCommandes,
+    getCommandeDetails} = require("../../controller/livreur/CommandeController");
 
 const { getLivreurStatistics } = require("../../controller/livreur/StatistiqueController");
 
@@ -34,7 +35,8 @@ module.exports = (io) => {
   router.patch('/accept-order/:orderId', livreurMiddleware, (req, res) => acceptCommande(req, res, io));
   router.patch('/refuse-order/:orderId', livreurMiddleware, (req, res) => refuseCommande(req, res, io));
   router.get('/orders', livreurMiddleware, getLivreurCommandes);
-  router.get('/commandes-today', livreurMiddleware, getLivreurCommandes);
+  router.get('/commandes-today', livreurMiddleware, getTodayLivreurCommandes);
+  router.get('/detail-order/::orderId', livreurMiddleware, getTodayLivreurCommandes);
   
  //statistique
 router.get('/statistics/:livreurId', getLivreurStatistics);
