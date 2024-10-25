@@ -13,7 +13,7 @@ const adminRouter = require("./router/admin/resto.router");
 const gestionairRouter = require("./router/gestionair/RestoGestion.router");
 const clientRouter = require("./router/client/search");
 const socket = require("./socket/socket");
-
+const { orderStatusSocket } = require("./socket/clientSocket");
 const cors = require("cors");
 const createRestaurantRouter = require("./router/admin/resto.router");
 const createRestoGestoiner = require("./router/gestionair/RestoGestionSocket.router");
@@ -28,6 +28,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -63,6 +64,7 @@ const io = require("socket.io")(server, {
   },
 });
 socket(io);
+orderStatusSocket(io); 
 const restaurantRouter = createRestaurantRouter(io);
 app.use("/api/v1/admin/", verifyToken, adminMiddleware, restaurantRouter);
 
