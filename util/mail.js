@@ -22,7 +22,8 @@ const envoyerEmail = async (
   confirmationLink = null,
   code = null,
   type,
-  data = null
+  data = null,
+  livreur = null,
 ) => {
   try {
     let htmlTemplate;
@@ -37,6 +38,12 @@ const envoyerEmail = async (
     } else if (type === "forgetpassword") {
       htmlTemplate = fs.readFileSync(
         path.join(__dirname, "public", "forgetpassword.html"),
+        "utf8"
+      );
+
+    } else if (type === "livreur") {
+      htmlTemplate = fs.readFileSync(
+        path.join(__dirname, "public", "livreur.html"),
         "utf8"
       );
     } else if (type === "VRA") {
@@ -73,9 +80,21 @@ const envoyerEmail = async (
       // Replace placeholders with actual data
       message = replacePlaceholders(htmlTemplate, data);
     }
+    if (livreur) {
+      function replacePlaceholders(template, livreur) {
+        for (let key in livreur) {
+          const placeholder = `{{${key}}}`;
+          template = template.replace(new RegExp(placeholder, "g"), livreur[key]);
+        }
+        return template;
+      }
+
+      // Replace placeholders with actual livreur
+      message = replacePlaceholders(htmlTemplate, livreur);
+    }
 
     const info = await transporter.sendMail({
-      from: useremail,
+      from: process.env.EMAIL, 
       to: email,
       subject: subject,
       html: message,
