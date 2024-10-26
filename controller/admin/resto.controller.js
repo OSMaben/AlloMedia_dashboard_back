@@ -18,7 +18,7 @@ const createUserWithRestaurant = async (req, res) => {
       phone,
     };
 
-    user.role = "client";
+    user.role = "manager";
     user.slug = slug(user.name);
 
     if (user.password) {
@@ -185,8 +185,8 @@ const getListrestaurants = async (req, res) => {
     const restaurants = await RestoModel.find({
       isAccepted: true,
     })
-      .populate("managerId", ["name"])
-      .select(["isDeleted", "isVisible", "restoname", "type"]);
+      .populate("managerId", ["name", "imgProfile"])
+      .select(["isDeleted", "isVisible", "restoname", "type", "logo"]);
 
     return res.status(200).json({
       restaurants,
@@ -202,7 +202,10 @@ const getListrestaurants = async (req, res) => {
 
 const getUnacceptedRestaurants = async (req, res) => {
   try {
-    const restaurants = await RestoModel.find({ isAccepted: false });
+    const restaurants = await RestoModel.find({ isAccepted: false }).populate(
+      "managerId",
+      ["name", "email", "imgProfile"]
+    );
 
     return res.status(200).json({
       restaurants,
@@ -250,28 +253,55 @@ const getListNotification = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
-    const latestNotification = await Notification.findOne({ admin: true })
-      .sort({ createdAt: -1 })
-      .exec();
-
     const notifications = await Notification.find({ admin: true })
+      .populate("mangerId", ["name", "imgProfile"])
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .exec();
+
+    const unreadCount = await Notification.countDocuments({
+      admin: true,
+      isWatch: false,
+    });
 
     const totalNotifications = await Notification.countDocuments({
       admin: true,
     });
 
     return res.status(200).json({
-      latestNotification,
       notifications,
       totalPages: Math.ceil(totalNotifications / limit),
       currentPage: page,
+      unreadCount,
     });
   } catch (error) {
     console.error("Error fetching notifications:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+const markAllAsRead = async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { admin: true, isWatch: false },
+      { isWatch: true }
+    );
+
+    const unreadCount = await Notification.countDocuments({
+      admin: true,
+      isWatch: false,
+    });
+
+    return res.status(200).json({
+      message: "All notifications marked as read",
+      unreadCount, 
+    });
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
     return res.status(500).json({
       message: "Internal Server Error",
       error: error.message,
@@ -289,4 +319,5 @@ module.exports = {
   createResto,
   getListNotification,
   banneRestaurant,
+  markAllAsRead,
 };

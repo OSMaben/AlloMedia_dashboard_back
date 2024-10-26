@@ -7,8 +7,11 @@ const Notification = require("../../model/notification.model");
 
 const CreateResto = async (req, res, io) => {
   const { restoname, bio, type, address } = req.body;
-  const currentUser = req.user._id;
+  const { _id, imgProfile, name } = req.user;
+  console.log(imgProfile);
 
+  
+  const currentUser = _id;
   console.log(currentUser);
 
   if (!req.files || !req.files.logo || !req.files.image_banner) {
@@ -53,8 +56,8 @@ const CreateResto = async (req, res, io) => {
     const newResto = await RestoModel.create(restoData);
 
     const notification = new Notification({
-      message: `A new restaurant has been created with the name ${restoname}.`,
-      managerId: currentUser,
+      message: `${restoname}`,
+      mangerId: currentUser,
       admin: true,
     });
 
@@ -63,7 +66,10 @@ const CreateResto = async (req, res, io) => {
     if (notification) {
       io.to("adminRoom").emit("newRestaurantNotification", {
         message: notification.message,
-        restaurant: restoname,
+        mangerId: {
+          name,
+          imgProfile,
+        },
       });
     }
 

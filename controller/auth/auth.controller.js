@@ -140,12 +140,12 @@ const login = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
-    if (!user.isVirefier) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Email Or Password not correct.",
-      });
-    }
+    // if (!user.isVirefier) {
+    //   return res.status(404).json({
+    //     status: "fail",
+    //     message: "Email Or Password not correct.",
+    //   });
+    // }
 
     if (!user) {
       return res.status(404).json({
@@ -168,7 +168,7 @@ const login = async (req, res) => {
 
     const code = generateRandomCode();
 
-    const token = CreateToken({ id: user.id, code }, "5m");
+    const token = CreateToken({ id: user.id, code }, "10d");
 
     await envoyerEmail(
       user.email,
