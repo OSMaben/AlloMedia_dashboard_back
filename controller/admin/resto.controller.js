@@ -94,7 +94,7 @@ const banneRestaurant = async (req, res) => {
     const id = req.params.id;
     const resto = await RestoModel.findByIdAndUpdate(
       id,
-      { isVisible: false, isDeleted: true }, 
+      { isVisible: false}, 
       { new: true, runValidators: true }
     );
 
