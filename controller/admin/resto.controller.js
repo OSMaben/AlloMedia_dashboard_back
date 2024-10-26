@@ -70,8 +70,8 @@ const createUserWithRestaurant = async (req, res) => {
 
 const deleteRestaurant = async (req, res) => {
   try {
-    const id = req.params.id; 
-    const resto = await RestoModel.findByIdAndDelete(id); 
+    const id = req.params.id;
+    const resto = await RestoModel.findByIdAndDelete(id);
     if (!resto) {
       return res.status(404).json({
         message: "Restaurant not found",
@@ -79,12 +79,12 @@ const deleteRestaurant = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Restaurant deleted successfully", 
+      message: "Restaurant deleted successfully",
     });
   } catch (error) {
     return res.status(500).json({
       message: "An error occurred while deleting the restaurant",
-      error: error.message || "Internal server error", 
+      error: error.message || "Internal server error",
     });
   }
 };
@@ -92,17 +92,25 @@ const deleteRestaurant = async (req, res) => {
 const banneRestaurant = async (req, res) => {
   try {
     const id = req.params.id;
-    const resto = await RestoModel.findById(id);
+    const resto = await RestoModel.findByIdAndUpdate(
+      id,
+      { isVisible: false, isDeleted: true }, 
+      { new: true, runValidators: true }
+    );
 
-    resto.isVisible = false;
-    resto.isDeleted = true;
-    await resto.save();
-    return res.status(201).json({
+    if (!resto) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Restaurant has been banned successfully",
       restaurant: resto,
     });
   } catch (error) {
     return res.status(500).json({
-      message: "An error occurred while creating the user and restaurant",
+      message: "An error occurred while banning the restaurant",
       error: error.message || "Internal server error",
     });
   }
