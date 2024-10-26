@@ -1,3 +1,78 @@
+
+const RestoModel = require("../../model/Resto.model");
+const mongoose = require("mongoose");
+const User = require("../../model/user.model");
+const express = require("express");
+const { body, validationResult } = require("express-validator");
+const Notification = require("../../model/notification.model");
+
+const CreateResto = async (req, res, io) => {
+  const { restoname, bio, type, address } = req.body;
+  const { _id, imgProfile, name } = req.user;
+  console.log(imgProfile);
+
+  
+  const currentUser = _id;
+  console.log(currentUser);
+
+  if (!req.files || !req.files.logo || !req.files.image_banner) {
+    return res
+      .status(400)
+      .json({ error: "Please provide valid logo and image banner files" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(currentUser)) {
+    return res.status(400).json({ error: "Invalid manager ID format" });
+  }
+
+  try {
+    const logoPath = req.files.logo[0].path;
+    const imageBannerPath = req.files.image_banner[0].path;
+
+    if (!logoPath || !imageBannerPath) {
+      return res
+        .status(400)
+        .json({ error: "Please provide valid logo and image banner files" });
+    }
+    const RestoNumber = await RestoModel.countDocuments({
+      managerId: currentUser,
+    });
+    console.log(RestoNumber);
+    if (RestoNumber >= 1) {
+      return res
+        .status(400)
+        .json({ error: "You cannot create more than 1 restaurants" });
+    }
+
+    const restoData = {
+      restoname,
+      logo: logoPath,
+      image_banner: imageBannerPath,
+      bio,
+      type,
+      address,
+      managerId: currentUser,
+    };
+
+    const newResto = await RestoModel.create(restoData);
+
+    const notification = new Notification({
+      message: `${restoname}`,
+      mangerId: currentUser,
+      admin: true,
+    });
+
+    await notification.save();
+
+    if (notification) {
+      io.to("adminRoom").emit("newRestaurantNotification", {
+        message: notification.message,
+        mangerId: {
+          name,
+          imgProfile,
+        },
+      });
+
 const RestoModel = require('../../model/Resto.model');
 const  mongoose  = require('mongoose');
 const User = require('../../model/user.model');
