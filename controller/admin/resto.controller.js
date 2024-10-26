@@ -70,16 +70,21 @@ const createUserWithRestaurant = async (req, res) => {
 
 const deleteRestaurant = async (req, res) => {
   try {
-    const id = req.params.id;
-    const resto = await RestoModel.findByIdAndDelete(id);
+    const id = req.params.id; 
+    const resto = await RestoModel.findByIdAndDelete(id); 
+    if (!resto) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
 
-    return res.status(201).json({
-      restaurant: resto,
+    return res.status(200).json({
+      message: "Restaurant deleted successfully", 
     });
   } catch (error) {
     return res.status(500).json({
-      message: "An error occurred while creating the user and restaurant",
-      error: error.message || "Internal server error",
+      message: "An error occurred while deleting the restaurant",
+      error: error.message || "Internal server error", 
     });
   }
 };
@@ -298,7 +303,7 @@ const markAllAsRead = async (req, res) => {
 
     return res.status(200).json({
       message: "All notifications marked as read",
-      unreadCount, 
+      unreadCount,
     });
   } catch (error) {
     console.error("Error marking all notifications as read:", error);
