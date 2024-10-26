@@ -18,7 +18,7 @@ const SearchRestaurants = async (req, res) => {
                     restoname: { 
                         $regex: searchTerm, 
                         $options: 'i' 
-                    } 
+                    }
                 };
                 break;
             
