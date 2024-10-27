@@ -215,9 +215,7 @@ const getListrestaurants = async (req, res) => {
       restaurants,
     });
   } catch (error) {
-    console.error("Error fetching restaurants:", error);
     return res.status(500).json({
-      message: "Internal Server Error",
       error: error.message,
     });
   }
