@@ -10,6 +10,7 @@ const {
   getListNotification,
   banneRestaurant,
   markAllAsRead,
+  isActiveRestaurant,
 } = require("../../controller/admin/resto.controller");
 const {
   validiteResto,
@@ -48,6 +49,8 @@ const createRestaurantRouter = (io) => {
     ValiditRestoId,
     banneRestaurant
   );
+
+  router.get("/active/restaurants/:id", ValiditRestoId, isActiveRestaurant);
 
   return router;
 };

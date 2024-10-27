@@ -9,7 +9,7 @@ const Notification = require("../../model/notification.model");
 
 const createUserWithRestaurant = async (req, res) => {
   try {
-    const { name, email, password, restoname, phone } = req.body;
+    const { name, email, password, restoname, phone, type } = req.body;
 
     const user = {
       name,
@@ -31,6 +31,7 @@ const createUserWithRestaurant = async (req, res) => {
       restoname,
       managerId: managerResto._id,
       isAccepted: true,
+      type,
     };
 
     const Resto = await RestoModel.create(resto);
@@ -94,7 +95,7 @@ const banneRestaurant = async (req, res) => {
     const id = req.params.id;
     const resto = await RestoModel.findByIdAndUpdate(
       id,
-      { isVisible: false}, 
+      { isVisible: false },
       { new: true, runValidators: true }
     );
 
@@ -106,6 +107,33 @@ const banneRestaurant = async (req, res) => {
 
     return res.status(200).json({
       message: "Restaurant has been banned successfully",
+      restaurant: resto,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occurred while banning the restaurant",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+const isActiveRestaurant = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const resto = await RestoModel.findByIdAndUpdate(
+      id,
+      { isVisible: true },
+      { new: true, runValidators: true }
+    );
+
+    if (!resto) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Restaurant has been actived  successfully",
       restaurant: resto,
     });
   } catch (error) {
@@ -142,26 +170,10 @@ const acceptedResto = async (req, res, io) => {
     manager.role = "manager";
     await manager.save();
 
-    const notification = new Notification({
-      message: `A new restaurant has been accepted with the name "${resto.name}".`,
-      managerId: manager._id,
-      admin: true,
-    });
-
-    await notification.save();
-
-    if (notification) {
-      io.to("adminRoom").emit("newRestaurantNotification", {
-        message: notification.message,
-        restaurant: resto,
-      });
-    }
-
     return res
       .status(200)
       .json({ message: "Restaurant successfully accepted" });
   } catch (error) {
-    console.error("Error accepting restaurant:", error);
     return res.status(500).json({
       message: "An error occurred while accepting the restaurant",
       error: error.message || "Internal server error",
@@ -333,4 +345,5 @@ module.exports = {
   getListNotification,
   banneRestaurant,
   markAllAsRead,
+  isActiveRestaurant,
 };
