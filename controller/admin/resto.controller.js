@@ -184,15 +184,13 @@ const acceptedResto = async (req, res, io) => {
 const refusedResto = async (req, res) => {
   try {
     const id = req.params.id;
-    const resto = await RestoModel.findById(id);
+    const resto = await RestoModel.findByIdAndDelete(id);
 
     if (!resto) {
       return res.status(404).json({
         message: "Restaurant not found",
       });
     }
-
-    await resto.deleteOne();
 
     return res.status(200).json({
       message: "Restaurant successfully refused",
