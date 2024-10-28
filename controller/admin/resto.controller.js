@@ -9,7 +9,7 @@ const Notification = require("../../model/notification.model");
 
 const createUserWithRestaurant = async (req, res) => {
   try {
-    const { name, email, password, restoname, phone } = req.body;
+    const { name, email, password, restoname, phone, type } = req.body;
 
     const user = {
       name,
@@ -18,7 +18,7 @@ const createUserWithRestaurant = async (req, res) => {
       phone,
     };
 
-    user.role = "client";
+    user.role = "manager";
     user.slug = slug(user.name);
 
     if (user.password) {
@@ -31,6 +31,7 @@ const createUserWithRestaurant = async (req, res) => {
       restoname,
       managerId: managerResto._id,
       isAccepted: true,
+      type,
     };
 
     const Resto = await RestoModel.create(resto);
@@ -72,13 +73,18 @@ const deleteRestaurant = async (req, res) => {
   try {
     const id = req.params.id;
     const resto = await RestoModel.findByIdAndDelete(id);
+    if (!resto) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
 
-    return res.status(201).json({
-      restaurant: resto,
+    return res.status(200).json({
+      message: "Restaurant deleted successfully",
     });
   } catch (error) {
     return res.status(500).json({
-      message: "An error occurred while creating the user and restaurant",
+      message: "An error occurred while deleting the restaurant",
       error: error.message || "Internal server error",
     });
   }
@@ -87,17 +93,52 @@ const deleteRestaurant = async (req, res) => {
 const banneRestaurant = async (req, res) => {
   try {
     const id = req.params.id;
-    const resto = await RestoModel.findById(id);
+    const resto = await RestoModel.findByIdAndUpdate(
+      id,
+      { isVisible: false },
+      { new: true, runValidators: true }
+    );
 
-    resto.isVisible = false;
-    resto.isDeleted = true;
-    await resto.save();
-    return res.status(201).json({
+    if (!resto) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Restaurant has been banned successfully",
       restaurant: resto,
     });
   } catch (error) {
     return res.status(500).json({
-      message: "An error occurred while creating the user and restaurant",
+      message: "An error occurred while banning the restaurant",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+const isActiveRestaurant = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const resto = await RestoModel.findByIdAndUpdate(
+      id,
+      { isVisible: true },
+      { new: true, runValidators: true }
+    );
+
+    if (!resto) {
+      return res.status(404).json({
+        message: "Restaurant not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Restaurant has been actived  successfully",
+      restaurant: resto,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occurred while banning the restaurant",
       error: error.message || "Internal server error",
     });
   }
@@ -129,26 +170,10 @@ const acceptedResto = async (req, res, io) => {
     manager.role = "manager";
     await manager.save();
 
-    const notification = new Notification({
-      message: `A new restaurant has been accepted with the name "${resto.name}".`,
-      managerId: manager._id,
-      admin: true,
-    });
-
-    await notification.save();
-
-    if (notification) {
-      io.to("adminRoom").emit("newRestaurantNotification", {
-        message: notification.message,
-        restaurant: resto,
-      });
-    }
-
     return res
       .status(200)
       .json({ message: "Restaurant successfully accepted" });
   } catch (error) {
-    console.error("Error accepting restaurant:", error);
     return res.status(500).json({
       message: "An error occurred while accepting the restaurant",
       error: error.message || "Internal server error",
@@ -159,15 +184,13 @@ const acceptedResto = async (req, res, io) => {
 const refusedResto = async (req, res) => {
   try {
     const id = req.params.id;
-    const resto = await RestoModel.findById(id);
+    const resto = await RestoModel.findByIdAndDelete(id);
 
     if (!resto) {
       return res.status(404).json({
         message: "Restaurant not found",
       });
     }
-
-    await resto.deleteOne();
 
     return res.status(200).json({
       message: "Restaurant successfully refused",
@@ -185,16 +208,14 @@ const getListrestaurants = async (req, res) => {
     const restaurants = await RestoModel.find({
       isAccepted: true,
     })
-      .populate("managerId", ["name"])
-      .select(["isDeleted", "isVisible", "restoname", "type"]);
+      .populate("managerId", ["name", "imgProfile"])
+      .select(["isDeleted", "isVisible", "restoname", "type", "logo"]);
 
     return res.status(200).json({
       restaurants,
     });
   } catch (error) {
-    console.error("Error fetching restaurants:", error);
     return res.status(500).json({
-      message: "Internal Server Error",
       error: error.message,
     });
   }
@@ -202,7 +223,10 @@ const getListrestaurants = async (req, res) => {
 
 const getUnacceptedRestaurants = async (req, res) => {
   try {
-    const restaurants = await RestoModel.find({ isAccepted: false });
+    const restaurants = await RestoModel.find({ isAccepted: false }).populate(
+      "managerId",
+      ["name", "email", "imgProfile"]
+    );
 
     return res.status(200).json({
       restaurants,
@@ -250,28 +274,55 @@ const getListNotification = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
-    const latestNotification = await Notification.findOne({ admin: true })
-      .sort({ createdAt: -1 })
-      .exec();
-
     const notifications = await Notification.find({ admin: true })
+      .populate("mangerId", ["name", "imgProfile"])
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .exec();
+
+    const unreadCount = await Notification.countDocuments({
+      admin: true,
+      isWatch: false,
+    });
 
     const totalNotifications = await Notification.countDocuments({
       admin: true,
     });
 
     return res.status(200).json({
-      latestNotification,
       notifications,
       totalPages: Math.ceil(totalNotifications / limit),
       currentPage: page,
+      unreadCount,
     });
   } catch (error) {
     console.error("Error fetching notifications:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+const markAllAsRead = async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { admin: true, isWatch: false },
+      { isWatch: true }
+    );
+
+    const unreadCount = await Notification.countDocuments({
+      admin: true,
+      isWatch: false,
+    });
+
+    return res.status(200).json({
+      message: "All notifications marked as read",
+      unreadCount,
+    });
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
     return res.status(500).json({
       message: "Internal Server Error",
       error: error.message,
@@ -289,4 +340,6 @@ module.exports = {
   createResto,
   getListNotification,
   banneRestaurant,
+  markAllAsRead,
+  isActiveRestaurant,
 };
