@@ -1,12 +1,12 @@
 const RestoModel = require('../../model/Resto.model');
 
+const mongoose = require('mongoose'); // <-- Add this line to import mongoose
+
 const SearchRestaurants = async (req, res) => {
     const { category, searchTerm, page = 1, limit = 10 } = req.query;
     
     if (!searchTerm || !category) {
-        return res.status(400).json({ 
-            error: 'Search term and category are required' 
-        });
+        return res.status(400).json({ error: 'Search term and category are required' });
     }
 
     try {
@@ -14,42 +14,22 @@ const SearchRestaurants = async (req, res) => {
         
         switch (category.toLowerCase()) {
             case 'name':
-                query = { 
-                    restoname: { 
-                        $regex: searchTerm, 
-                        $options: 'i' 
-                    }
-                };
+                query = { restoname: { $regex: searchTerm, $options: 'i' } };
                 break;
             
             case 'cuisine':
-                query = { 
-                    type: { 
-                        $regex: searchTerm, 
-                        $options: 'i' 
-                    } 
-                };
+                query = { type: { $regex: searchTerm, $options: 'i' } };
                 break;
             
             case 'location':
-                query = { 
-                    'address': { 
-                        $regex: searchTerm, 
-                        $options: 'i' 
-                    } 
-                };
+                query = { 'address': { $regex: searchTerm, $options: 'i' } };
                 break;
             
             default:
-                return res.status(400).json({ 
-                    error: 'Invalid search category' 
-                });
+                return res.status(400).json({ error: 'Invalid search category' });
         }
 
-        // Calculate skip value for pagination
         const skip = (page - 1) * limit;
-
-        // Get total count for pagination
         const total = await RestoModel.countDocuments(query);
 
         const restaurants = await RestoModel.find(query)
@@ -70,12 +50,45 @@ const SearchRestaurants = async (req, res) => {
 
     } catch (error) {
         console.error('Search error:', error);
-        res.status(500).json({ 
-            error: 'An error occurred while searching restaurants' 
-        });
+        res.status(500).json({ error: 'An error occurred while searching restaurants' });
+    }
+};
+
+
+
+
+// Fetch a single restaurant by ID
+const getRestaurantDetails = async (req, res) => {
+    try {
+        const restaurantId = req.params.id;
+
+        // Validate if the ID is a valid MongoDB ObjectId
+        if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+            return res.status(400).json({ error: 'Invalid restaurant ID' });
+        }
+
+        // Find the restaurant by ID
+        const restaurant = await RestoModel.findById(restaurantId);
+
+        if (!restaurant) {
+            return res.status(404).json({ error: 'Restaurant not found' });
+        }
+
+        res.status(200).json(restaurant);
+    } catch (error) {
+        console.error('Error fetching restaurant:', error);
+        res.status(500).json({ error: 'Failed to fetch restaurant details' });
     }
 };
 
 module.exports = {
-    SearchRestaurants
+    getRestaurantDetails
+};
+
+module.exports = { getRestaurantDetails };
+
+
+
+module.exports = {
+    SearchRestaurants, getRestaurantDetails
 };

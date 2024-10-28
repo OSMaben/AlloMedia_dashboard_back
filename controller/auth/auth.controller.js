@@ -6,6 +6,7 @@ const envoyerEmail = require("../../util/mail");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
 const { generateRandomCode } = require("../../util/generateRandomCode");
+const { use } = require("../../router/profile.router");
 
 const regester = async (req, res) => {
   const data = req.body;
@@ -137,15 +138,10 @@ const verifierAccount = async (req, res) => {
 };
 
 const login = async (req, res) => {
+
+
   try {
     const user = await User.findOne({ email: req.body.email });
-
-    if (!user.isVirefier) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Email Or Password not correct.",
-      });
-    }
 
     if (!user) {
       return res.status(404).json({
@@ -165,6 +161,18 @@ const login = async (req, res) => {
         message: "Email Or Password not correct.",
       });
     }
+
+
+
+    if (!user.isVirefier) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Email Or Password not correct.",
+      });
+    }
+
+
+
 
     const code = generateRandomCode();
 
@@ -423,7 +431,7 @@ const sendMail = async (req, res) => {
     return res.status(201).json({
       msg: "mail en vouye",
     });
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const logout = async (req, res) => {
