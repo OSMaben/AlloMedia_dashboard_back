@@ -1,7 +1,7 @@
 const Commande = require("../../model/Commande.model");
 const User=require("../../model/user.model")
 const getLivreurStatistics = async (req, res) => {
-  const { livreurId } = req.params;
+  const livreurId = req.user._id; 
 
   try {
     
@@ -17,7 +17,7 @@ const getLivreurStatistics = async (req, res) => {
     const commandesLivrees = commandes.filter(commande => commande.status === 'delivered').length;
     const commandesRefusees = commandes.filter(commande => commande.status === 'refused').length;
     const commandesAcceptees = commandes.filter(commande => commande.status === 'accepted').length;
-
+    const  commandesRestaures = commandes.filter(commande => commande.status === 'restord').length;
     const tauxDeLivraison = totalCommandes > 0 ? (commandesLivrees / totalCommandes) * 100 : 0;
 
   
@@ -28,8 +28,9 @@ const getLivreurStatistics = async (req, res) => {
       commandesLivrees,
       commandesRefusees,
       commandesAcceptees,
+      commandesRestaures,
       tauxDeLivraison: tauxDeLivraison.toFixed(2) + '%',
-      dureeMoyenneLivraison: dureeMoyenneLivraison.toFixed(2) + ' minutes',
+     
     });
 
   } catch (error) {
