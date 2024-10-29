@@ -6,6 +6,7 @@ const envoyerEmail = require("../../util/mail");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
 const { generateRandomCode } = require("../../util/generateRandomCode");
+const { use } = require("../../router/profile.router");
 
 const regester = async (req, res) => {
   const data = req.body;
@@ -32,7 +33,8 @@ const regester = async (req, res) => {
       "verfei accoute",
       confirmationLink,
       null,
-      "OTP"
+      "OTP",
+      null
     );
 
     return res.status(201).json({
@@ -63,7 +65,8 @@ const resendVerification = async (req, res) => {
       "verfei accoute",
       confirmationLink,
       null,
-      "OTP"
+      "OTP",
+      null
     );
 
     return res.status(201).json({
@@ -105,7 +108,7 @@ const verifierAccount = async (req, res) => {
     if (!currentUser) {
       return res.status(401).json({
         status: "fail",
-        message: "The user belonging to this token no longer exists.",
+        message: "The user belonging to this token no longer exists yyyyyyyy",
       });
     }
 
@@ -135,22 +138,22 @@ const verifierAccount = async (req, res) => {
 };
 
 const login = async (req, res) => {
+
+
   try {
     const user = await User.findOne({ email: req.body.email });
+    
 
-    if (!user.isVirefier) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Email Or Password not correct.",
-      });
-    }
 
-    if (!user) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Email Or Password not correct.",
-      });
-    }
+    // if (!user.isVirefier) {
+    //   return res.status(404).json({
+    //     status: "fail",
+    //     message: "Email Or Password not correct.",
+    //   });
+    // }
+
+
+
 
     const verifyPassword = await bcryptjs.compare(
       req.body.password,
@@ -164,16 +167,29 @@ const login = async (req, res) => {
       });
     }
 
+
+
+    if (!user.isVirefier) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Email Or Password not correct.",
+      });
+    }
+
+
+
+
     const code = generateRandomCode();
 
-    const token = CreateToken({ id: user.id, code }, "5m");
+    const token = CreateToken({ id: user.id, code }, "10d");
 
     await envoyerEmail(
       user.email,
       "verfei accoute par code",
       (confirmationLink = null),
       code,
-      "2FA"
+      "2FA",
+      null
     );
 
     return res.status(201).json({
@@ -217,7 +233,8 @@ const forgetpassword = async (req, res) => {
       "forgetpassword",
       (confirmationLink = null),
       code,
-      "forgetpassword"
+      "forgetpassword",
+      null
     );
 
     return res.status(200).json({
@@ -419,7 +436,7 @@ const sendMail = async (req, res) => {
     return res.status(201).json({
       msg: "mail en vouye",
     });
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const logout = async (req, res) => {

@@ -5,7 +5,7 @@ const verifyToken = async (req, res, next) => {
   // 1 check Token
   try {
     let token;
-
+    
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
@@ -28,21 +28,15 @@ const verifyToken = async (req, res, next) => {
     const decodeToken = jwt.verify(token, process.env.JWT_SCREPT_KEY);
 
     if (!decodeToken) {
-      throw "You are not login , Please login to get access this route";
+      throw "You are not login , Please login to get access this route ssssssssssssss";
     }
 
-    const currentUser = await UserModel.findById(decodeToken.id).select([
-      "passwordChangedAt",
-      "role",
-      "name",
-      "email",
-      "password",
-    ]);
+    const currentUser = await UserModel.findById(decodeToken.id);
 
     if (!currentUser) {
       return res.status(401).json({
         status: "fail",
-        message: "The user belonging to this token no longer exists.",
+        message: "The user belonging to this token no longer exists. ",
       });
     }
 
