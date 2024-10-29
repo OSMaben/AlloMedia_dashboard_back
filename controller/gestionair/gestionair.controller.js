@@ -1,5 +1,9 @@
 const RestoModel = require("../../model/Resto.model");
 const mongoose = require("mongoose");
+const Command = require("../../model/Commande.model");
+
+
+
 
 const CreateResto = async (req, res) => {
   const { restoname, bio, type, address } = req.body;
@@ -252,6 +256,7 @@ const DeleteMenu = async (req, res) => {
   }
 };
 
+
 const ListResto = async (req, res) => {
   const currentUser = req.user._id;
   console.log(currentUser);
@@ -305,6 +310,80 @@ const ListMenu = async (req, res) => {
   }
 };
 
+
+
+
+
+
+//Accept  The Menu
+const AcceptMenu = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) return res.status(400).json({ error: "OrderId not provided" });
+
+  console.log(id);
+
+  try {
+    const FindOrder = await Command.findById(id);
+
+    if (!FindOrder) return res.status(404).json({ error: "Order not found" });
+
+    FindOrder.status = "accepted";
+    await FindOrder.save();
+
+    return res.status(200).json({ message: "Order has been successfully accepted" });
+  } catch (err) {
+    console.error(`There was an error: ${err}`);
+    return res.status(500).json({ error: "An internal server error occurred" });
+  }
+};
+
+
+//refuse Order
+const RefuseMenu = async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.status(400).json({ error: "OrderId not provided" });
+  console.log(id);
+  try {
+    const FindOrder = await Command.findById(id);
+
+    if (!FindOrder) return res.status(404).json({ error: "Order not found" });
+
+    FindOrder.status = "canceld";
+    await FindOrder.save();
+
+    return res.status(200).json({ message: "Order has been successfully canceled" });
+  } catch (err) {
+    console.error(`There was an error: ${err}`);
+    return res.status(500).json({ error: "An internal server error occurred" });
+  }
+};
+
+
+const ListResto = async (req, res) => {
+
+  const userId =  req.user._id;
+
+  try {
+
+      const restaurant = await RestoModel.findOne({ managerId: userId });
+
+      if (!restaurant) {
+        return res.status(404).json({ message: "Restaurant not found for this user" });
+      }
+
+      return res.status(200).json(restaurant);
+    } catch (err) {
+      console.error(`Error fetching restaurant: ${err}`);
+      return res.status(500).json({ error: "An internal server error occurred" });
+    }
+  };
+
+
+
+
+
+
 module.exports = {
   CreateResto,
   AddMenuImages,
@@ -313,5 +392,8 @@ module.exports = {
   DeleteMenu,
   DeleteResto,
   ListResto,
+  AcceptMenu,
   ListMenu,
+  RefuseMenu,
+  ListResto
 };
