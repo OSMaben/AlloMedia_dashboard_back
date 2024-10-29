@@ -1,4 +1,4 @@
-# AlloMedia_dashboard_back
+# AlloMedia Dashboard Backend
 
 ## Contexte du Projet
 
@@ -61,6 +61,15 @@ AlloMedia est une application de livraison qui facilite la gestion des commandes
 
 ## Installation et Lancement
 
-1. Clonez le dépôt :
+### Prérequis
+Assurez-vous d'avoir les éléments suivants installés :
+- **Node.js** (version 14 ou supérieure)
+- **npm** ou **yarn** (pour la gestion des packages)
+
+### Étapes
+1. **Cloner le Dépôt** :
    ```bash
-   git clone https://github.com/OSMaben/AlloMedia_dashboard_back
+   git clone https://github.com/OSMaben/allomedia_dashboard_back.git
+   cd allomedia_dashboard_back
+   npm i
+   npm start
