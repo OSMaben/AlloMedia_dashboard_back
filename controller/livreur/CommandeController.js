@@ -214,10 +214,13 @@ const getTodayLivreurCommandes = async (req, res) => {
       livreur: livreurId,
       createdAt: { $gte: today }, 
     })
+
+    
+
       .sort({ createdAt: 1 }) 
       .populate('client')
       .exec();
-      // console.log("ffffffffffffffffffffffffffffffff",commandes);
+      console.log("ffffffffffffffffffffffffffffffff",commandes);
 
     if (!commandes.length) {
       return res.status(404).json({ message: "Aucune commande trouvée pour aujourd'hui." });
