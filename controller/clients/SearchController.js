@@ -59,17 +59,16 @@ const SearchRestaurants = async (req, res) => {
   }
 };
 
-// Fetch a single restaurant by ID
+D
 const getRestaurantDetails = async (req, res) => {
   try {
     const restaurantId = req.params.id;
 
-    // Validate if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
       return res.status(400).json({ error: "Invalid restaurant ID" });
     }
 
-    // Find the restaurant by ID
+    
     const restaurant = await RestoModel.findById(restaurantId);
 
     if (!restaurant) {
