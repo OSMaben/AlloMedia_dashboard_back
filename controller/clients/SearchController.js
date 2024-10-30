@@ -1,6 +1,6 @@
 const  RestoModel = require("../../model/Resto.model");
 
-const mongoose = require("mongoose"); // <-- Add this line to import mongoose
+const mongoose = require("mongoose"); 
 
 const SearchRestaurants = async (req, res) => {
   const { category, searchTerm, page = 1, limit = 10 } = req.query;
