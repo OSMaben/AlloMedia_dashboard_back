@@ -9,7 +9,6 @@ const router = express.Router();
 
 router.post(
   "/upload/imgproflile",
-  verifyToken,
   upload.single("image"),
   uplodProfileImage
 );

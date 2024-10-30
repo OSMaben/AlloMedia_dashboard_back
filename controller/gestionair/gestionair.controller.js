@@ -1,10 +1,10 @@
+const Notification = require("../../model/notification.model");
 const RestoModel = require("../../model/Resto.model");
 const mongoose = require("mongoose");
 
-const CreateResto = async (req, res) => {
+const CreateResto = async (req, res, io) => {
   const { restoname, bio, type, address } = req.body;
-  const currentUser = req.user._id;
-
+  const {_id , name , imgProfile} = req.user;
 
   if (!req.files || !req.files.logo || !req.files.image_banner) {
     return res
@@ -12,7 +12,7 @@ const CreateResto = async (req, res) => {
       .json({ error: "Please provide valid logo and image banner files" });
   }
 
-  if (!mongoose.Types.ObjectId.isValid(currentUser)) {
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
     return res.status(400).json({ error: "Invalid manager ID format" });
   }
 
@@ -26,7 +26,7 @@ const CreateResto = async (req, res) => {
         .json({ error: "Please provide valid logo and image banner files" });
     }
     const RestoNumber = await RestoModel.countDocuments({
-      managerId: currentUser,
+      managerId: _id,
     });
     console.log(RestoNumber);
     if (RestoNumber >= 1) {
@@ -42,13 +42,13 @@ const CreateResto = async (req, res) => {
       bio,
       type,
       address,
-      managerId: currentUser,
+      managerId: _id,
     };
 
     const newResto = await RestoModel.create(restoData);
     const notification = new Notification({
       message: `${restoname}`,
-      mangerId: currentUser,
+      mangerId: _id,
       admin: true,
     });
 

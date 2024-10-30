@@ -297,7 +297,6 @@ const getListNotification = async (req, res) => {
       unreadCount,
     });
   } catch (error) {
-    console.error("Error fetching notifications:", error);
     return res.status(500).json({
       message: "Internal Server Error",
       error: error.message,

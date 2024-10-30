@@ -1,3 +1,4 @@
+const UserModel = require("../model/user.model");
 const User = require("../model/user.model");
 const path = require("path");
 
@@ -10,19 +11,21 @@ const getLocalFileUrl = (filePath, req) => {
 const uplodProfileImage = async (req, res) => {
   try {
     const user = req.user;
+
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé." });
+    }
+
     if (!req.file) {
       return res.status(400).json({ error: "Veuillez télécharger une image." });
     }
 
-    console.log(req.file.path);
-
     const fileUrl = getLocalFileUrl(req.file.path, req);
 
-    console.log("====================================");
-    console.log(req.file);
-    console.log("====================================");
-
-    user.imgProfile.url = fileUrl;
+    user.imgProfile = {
+      url: fileUrl,
+      id: null,
+    };
 
     await user.save();
 
@@ -37,8 +40,7 @@ const uplodProfileImage = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
-
+    console.log("Error during profile image upload:", error);
     res.status(500).json({ error: error.message });
   }
 };
