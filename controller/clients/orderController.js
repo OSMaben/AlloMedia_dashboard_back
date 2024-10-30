@@ -1,7 +1,10 @@
 const Commande = require('../../model/Commande.model');
 
 const placeOrder = async (req, res) => {
+
+
     try {
+
         const { userId, deliveryAddress, items, totalPrice } = req.body;
 
         if (!userId || !deliveryAddress || !items || !totalPrice) {
@@ -11,13 +14,38 @@ const placeOrder = async (req, res) => {
         // Assuming you are assigning a default livreur or fetching it based on business logic
         const restaurantId = items[0]?.restaurantId; // Extract restaurant ID from the first item
 
+        const currentUser = req.user._id;
+        const { deliveryAddress, items, totalPrice } = req.body;
+
+
+        if(!currentUser )
+            return res.status(400).json({msg: "User Not Found"});
+        if(!deliveryAddress)
+            return res.status(400).json({msg: "Delivery address address are required"});
+        if(!items || !items.length  === 0)
+            return res.status(400).json({msg: "Please Add An Item to  cart"});
+        if(!totalPrice)
+            return res.status(400).json({msg: "Total price are required"});
+
+        // console.log(currentUser)
+
+        const livreurId = null;
+        const restaurantId = items[0]?.restaurantId;
+
+
         if (!restaurantId) {
             return res.status(400).json({ error: 'Restaurant ID is required' });
         }
 
+
         // Create a new Commande
         const newOrder = new Commande({
             client: userId, // Assuming userId is the client ID
+
+        const newOrder = new Commande({
+            client: currentUser,
+
+
             restaurant: restaurantId, // Use the restaurant ID from the items
             items: items.map(item => ({
                 name: item.name,
@@ -54,3 +82,6 @@ const getOrderStatus = async (req, res) => {
 };
 
 module.exports = { placeOrder , getOrderStatus};
+
+module.exports = { placeOrder };
+

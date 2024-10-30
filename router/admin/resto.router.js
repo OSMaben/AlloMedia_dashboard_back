@@ -9,6 +9,8 @@ const {
   createResto,
   getListNotification,
   banneRestaurant,
+  markAllAsRead,
+  isActiveRestaurant,
 } = require("../../controller/admin/resto.controller");
 const {
   validiteResto,
@@ -40,12 +42,15 @@ const createRestaurantRouter = (io) => {
   router.get("/restaurants/approved", getListrestaurants);
   router.get("/restaurants/pending", getUnacceptedRestaurants);
   router.get("/getListNotification", getListNotification);
+  router.get("/updutListNotification", markAllAsRead);
   router.delete("/deleted/restaurants/:id", ValiditRestoId, deleteRestaurant);
   router.get(
     "/banneRestaurant/restaurants/:id",
     ValiditRestoId,
     banneRestaurant
   );
+
+  router.get("/active/restaurants/:id", ValiditRestoId, isActiveRestaurant);
 
   return router;
 };

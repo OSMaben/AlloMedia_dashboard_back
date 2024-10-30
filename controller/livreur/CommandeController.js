@@ -40,6 +40,44 @@ const refuseCommande = async (req, res, io) => {
     });
   }
 };
+const restordCommande = async (req, res, io) => {
+  const { commandeId } = req.params;
+  const { restordReason } = req.body;
+  const livreurId = req.user._id;
+
+  try {
+    const commande = await Commande.findById(commandeId);
+
+    if (!commande) {
+      return res.status(404).json({ message: "Commande not found" });
+    }
+
+    if (commande.livreur.toString() !== livreurId.toString()) {
+      return res.status(403).json({ message: "You are not authorized to refuse this commande" });
+    }
+
+    commande.status = 'restord';
+    commande.restordReason = restordReason || "No reason provided";
+    await commande.save();
+
+    
+    io.to(commande.restaurant.managerId).emit("notification", {
+      message: `Order #${commande._id} has been refused by the client.`,
+      status: commande.status,
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Commande has been restord",
+      data: commande,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      message: "An error occurred while restording the commande",
+      error: error.message || "Internal server error",
+    });
+  }
+};
 
 // Confirm delivery and send notification
 const confirmDelivery = async (req, res, io) => {
@@ -62,6 +100,7 @@ const confirmDelivery = async (req, res, io) => {
     }
 
     commande.status = 'delivered';
+    commande.deliveredAt = Date.now();
     await commande.save();
 
     // Emit notification to the manager
@@ -119,7 +158,7 @@ const acceptCommande = async (req, res, io) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Une erreur s'est produite lors de l'acceptation de la commande",
+      message: "Une erreur s'est produite lors de l'acceptation de la commande ",
       error: error.message || "Erreur interne du serveur",
     });
   }
@@ -130,30 +169,22 @@ const acceptCommande = async (req, res, io) => {
 // get livreur's orders with filters
 const getLivreurCommandes = async (req, res) => {
   const livreurId = req.user._id; 
-  const { status = 'pending', startDate, endDate } = req.query; 
-
+  const { status } = req.query; 
+  
   try {
-    // Préparer les filtres
-    let filters = { livreur: livreurId, status }; 
+    // Create filters based on the incoming request
+    const filters = { livreur: livreurId };
+    if (status) filters.status = status; 
 
-    // Filtrer par date si les paramètres sont fournis
-    if (startDate && endDate) {
-      filters.createdAt = {
-        $gte: new Date(startDate),  
-        $lte: new Date(endDate),    
-      };
-    }
+    console.log("Filters used:", filters); // Log filters for debugging
 
-    // Rechercher les commandes selon les filtres
-    const commandes = await Commande.find(filters)
-                                   .populate('client') 
-                                   .populate('restaurant')
-                                   .exec();
+    const commandes = await Commande.find(filters).populate('client').exec();
 
-   
     if (!commandes.length) {
+      console.log("No commandes found for:", filters);
       return res.status(404).json({ message: "Aucune commande trouvée pour ce livreur avec les filtres spécifiés." });
     }
+    
 
     return res.status(200).json({
       status: "success",
@@ -161,12 +192,14 @@ const getLivreurCommandes = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Error fetching commandes:", error); // Log error for debugging
     return res.status(500).json({
       message: "Une erreur s'est produite lors de la récupération des commandes",
       error: error.message || "Erreur interne du serveur",
     });
   }
 };
+
 
 const getTodayLivreurCommandes = async (req, res) => {
   const livreurId = req.user._id;
@@ -181,10 +214,13 @@ const getTodayLivreurCommandes = async (req, res) => {
       livreur: livreurId,
       createdAt: { $gte: today }, 
     })
+
+    
+
       .sort({ createdAt: 1 }) 
       .populate('client')
       .exec();
-      // console.log("ffffffffffffffffffffffffffffffff",commandes);
+      console.log("ffffffffffffffffffffffffffffffff",commandes);
 
     if (!commandes.length) {
       return res.status(404).json({ message: "Aucune commande trouvée pour aujourd'hui." });
@@ -211,7 +247,7 @@ const getCommandeDetails = async (req, res) => {
  
     const commande = await Commande.findById(id)
       .populate('client', 'name phone ') 
-      .populate('restaurant', 'restoname address') 
+      // .populate('restaurant', 'restoname address') 
       .exec();
 
     if (!commande) {
@@ -231,15 +267,59 @@ const getCommandeDetails = async (req, res) => {
 };
 
 
+async function getPendingCommandesForLivreur(req, res) {
+  const livreurId = req.user._id;
+  try {
+    const pendingCommandes = await Commande.find({
+      livreur: livreurId,
+      status: 'pending'
+    }).populate('client'); 
+
+    return res.status(200).json({
+      status: "success",
+      pendingCommandes,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Erreur lors de la récupération des commandes pending",
+      error: error.message,
+    });
+  }
+}
+
+
+async function getAcceptedCommandesForLivreur(req, res) {
+  const livreurId = req.user._id;
+  try {
+    const pendingCommandes = await Commande.find({
+      livreur: livreurId,
+      status: 'accepted'
+    }).populate('client'); 
+
+    return res.status(200).json({
+      status: "success",
+      pendingCommandes,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Erreur lors de la récupération des commandes accepted",
+      error: error.message,
+    });
+  }
+}
+
+
 
 
 
 module.exports = {
   confirmDelivery,
+  restordCommande,
   refuseCommande,
   acceptCommande,
   getLivreurCommandes,
   getTodayLivreurCommandes,
-  getTodayLivreurCommandes,
   getCommandeDetails,
+  getPendingCommandesForLivreur,
+  getAcceptedCommandesForLivreur
 };
