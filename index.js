@@ -47,7 +47,7 @@ const io = require("socket.io")(server, {
 });
 
 // Initialize socket events
-// socket(io);
+socket(io);
 
 // Use the io object after initialization
 app.use("/api/livreur", verifyToken, LivreurRouter(io));
